@@ -1,0 +1,240 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+
+[Serializable]
+struct Banda
+{
+    public string Nome;
+    public string TipoMusica;
+    public int NumIntegrantes;
+    public int PosicaoRanking;
+}
+
+class Program
+{
+    static List<Banda> bandas = new List<Banda>();
+
+    static void Main()
+    {
+        while (true)
+        {
+            Console.WriteLine("Menu:");
+            Console.WriteLine("a) Cadastrar banda");
+            Console.WriteLine("b) Listar bandas cadastradas");
+            Console.WriteLine("c) Salvar e carregar dados");
+            Console.WriteLine("d) Exibir informações de uma banda por posição no ranking");
+            Console.WriteLine("e) Exibir bandas por gênero de música");
+            Console.WriteLine("f) Exibir dados de uma banda por nome");
+            Console.WriteLine("g) Excluir banda");
+            Console.WriteLine("h) Alterar dados de uma banda");
+            Console.WriteLine("i) Sair");
+
+            char opcao = Console.ReadKey().KeyChar;
+            Console.WriteLine();
+
+            switch (opcao)
+            {
+                case 'a':
+                    CadastrarBanda();
+                    break;
+                case 'b':
+                    ListarBandas();
+                    break;
+                case 'c':
+                    SalvarCarregarDados();
+                    break;
+                case 'd':
+                    ExibirBandaPorPosicao();
+                    break;
+                case 'e':
+                    ExibirBandasPorGenero();
+                    break;
+                case 'f':
+                    ExibirDadosBandaPorNome();
+                    break;
+                case 'g':
+                    ExcluirBanda();
+                    break;
+                case 'h':
+                    AlterarDadosBanda();
+                    break;
+                case 'i':
+                    return;
+                default:
+                    Console.WriteLine("Opção inválida. Tente novamente.");
+                    break;
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    static void CadastrarBanda()
+    {
+        Banda novaBanda = new Banda();
+
+        Console.Write("Nome da banda: ");
+        novaBanda.Nome = Console.ReadLine();
+
+        Console.Write("Tipo de música: ");
+        novaBanda.TipoMusica = Console.ReadLine();
+
+        Console.Write("Número de integrantes: ");
+        novaBanda.NumIntegrantes = Convert.ToInt32(Console.ReadLine());
+
+        Console.Write("Posição no ranking: ");
+        novaBanda.PosicaoRanking = Convert.ToInt32(Console.ReadLine());
+
+        bandas.Add(novaBanda);
+        Console.WriteLine("Banda cadastrada com sucesso!");
+    }
+
+    static void ListarBandas()
+    {
+        if (bandas.Count == 0)
+        {
+            Console.WriteLine("Nenhuma banda cadastrada.");
+            return;
+        }
+
+        foreach (var banda in bandas)
+        {
+            Console.WriteLine($"Nome: {banda.Nome}, Tipo de música: {banda.TipoMusica}, Integrantes: {banda.NumIntegrantes}, Posição no ranking: {banda.PosicaoRanking}");
+        }
+    }
+
+    static void SalvarCarregarDados()
+    {
+        try
+        {
+            IFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream("bandas.dat", FileMode.Create, FileAccess.Write);
+            formatter.Serialize(stream, bandas);
+            stream.Close();
+
+            Console.WriteLine("Dados salvos com sucesso!");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Erro ao salvar dados: {e.Message}");
+        }
+
+        try
+        {
+            IFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream("bandas.dat", FileMode.Open, FileAccess.Read);
+            bandas = (List<Banda>)formatter.Deserialize(stream);
+            stream.Close();
+
+            Console.WriteLine("Dados carregados com sucesso!");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Erro ao carregar dados: {e.Message}");
+        }
+    }
+
+    static void ExibirBandaPorPosicao()
+    {
+        Console.Write("Digite a posição no ranking: ");
+        int posicao = Convert.ToInt32(Console.ReadLine());
+
+        var banda = bandas.Find(b => b.PosicaoRanking == posicao);
+
+        if (banda.Nome != null)
+        {
+            Console.WriteLine($"Nome: {banda.Nome}, Tipo de música: {banda.TipoMusica}, Integrantes: {banda.NumIntegrantes}, Posição no ranking: {banda.PosicaoRanking}");
+        }
+        else
+        {
+            Console.WriteLine("Banda não encontrada.");
+        }
+    }
+
+    static void ExibirBandasPorGenero()
+    {
+        Console.Write("Digite o gênero de música: ");
+        string genero = Console.ReadLine();
+
+        var bandasGenero = bandas.FindAll(b => b.TipoMusica.Equals(genero, StringComparison.OrdinalIgnoreCase));
+
+        if (bandasGenero.Count > 0)
+        {
+            foreach (var banda in bandasGenero)
+            {
+                Console.WriteLine($"Nome: {banda.Nome}, Tipo de música: {banda.TipoMusica}, Integrantes: {banda.NumIntegrantes}, Posição no ranking: {banda.PosicaoRanking}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Nenhuma banda encontrada com esse gênero de música.");
+        }
+    }
+
+    static void ExibirDadosBandaPorNome()
+    {
+        Console.Write("Digite o nome da banda: ");
+        string nome = Console.ReadLine();
+
+        var banda = bandas.Find(b => b.Nome.Equals(nome, StringComparison.OrdinalIgnoreCase));
+
+        if (banda.Nome != null)
+        {
+            Console.WriteLine($"Nome: {banda.Nome}, Tipo de música: {banda.TipoMusica}, Integrantes: {banda.NumIntegrantes}, Posição no ranking: {banda.PosicaoRanking}");
+        }
+        else
+        {
+            Console.WriteLine("Banda não encontrada.");
+        }
+    }
+
+    static void ExcluirBanda()
+    {
+        Console.Write("Digite o nome da banda que deseja excluir: ");
+        string nome = Console.ReadLine();
+
+        var banda = bandas.Find(b => b.Nome.Equals(nome, StringComparison.OrdinalIgnoreCase));
+
+        if (banda.Nome != null)
+        {
+            bandas.Remove(banda);
+            Console.WriteLine("Banda excluída com sucesso!");
+        }
+        else
+        {
+            Console.WriteLine("Banda não encontrada.");
+        }
+    }
+
+    static void AlterarDadosBanda()
+    {
+        Console.Write("Digite o nome da banda que deseja alterar: ");
+        string nome = Console.ReadLine();
+
+        var banda = bandas.Find(b => b.Nome.Equals(nome, StringComparison.OrdinalIgnoreCase));
+
+        if (banda.Nome != null)
+        {
+            Console.Write("Novo nome da banda: ");
+            banda.Nome = Console.ReadLine();
+
+            Console.Write("Novo tipo de música: ");
+            banda.TipoMusica = Console.ReadLine();
+
+            Console.Write("Novo número de integrantes: ");
+            banda.NumIntegrantes = Convert.ToInt32(Console.ReadLine());
+
+            Console.Write("Nova posição no ranking: ");
+            banda.PosicaoRanking = Convert.ToInt32(Console.ReadLine());
+
+            Console.WriteLine("Dados da banda alterados com sucesso!");
+        }
+        else
+        {
+            Console.WriteLine("Banda não encontrada.");
+        }
+    }
+}
