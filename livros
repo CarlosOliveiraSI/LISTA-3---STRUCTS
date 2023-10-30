@@ -1,0 +1,127 @@
+using System;
+using System.Collections.Generic;
+
+struct Livro
+{
+    public string Titulo;
+    public string Autor;
+    public int Ano;
+    public int Prateleira;
+}
+
+class Program
+{
+    static List<Livro> biblioteca = new List<Livro>();
+
+    static void Main()
+    {
+        while (true)
+        {
+            Console.WriteLine("Menu:");
+            Console.WriteLine("a) Cadastrar livro");
+            Console.WriteLine("b) Procurar livro por título");
+            Console.WriteLine("c) Mostrar todos os livros");
+            Console.WriteLine("d) Livros mais novos");
+            Console.WriteLine("e) Sair");
+
+            char opcao = Console.ReadKey().KeyChar;
+            Console.WriteLine();
+
+            switch (opcao)
+            {
+                case 'a':
+                    CadastrarLivro();
+                    break;
+                case 'b':
+                    ProcurarLivroPorTitulo();
+                    break;
+                case 'c':
+                    MostrarTodosLivros();
+                    break;
+                case 'd':
+                    LivrosMaisNovos();
+                    break;
+                case 'e':
+                    return;
+                default:
+                    Console.WriteLine("Opção inválida. Tente novamente.");
+                    break;
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    static void CadastrarLivro()
+    {
+        Livro novoLivro = new Livro();
+
+        Console.Write("Título (até 30 caracteres): ");
+        novoLivro.Titulo = Console.ReadLine();
+
+        Console.Write("Autor (até 15 caracteres): ");
+        novoLivro.Autor = Console.ReadLine();
+
+        Console.Write("Ano: ");
+        novoLivro.Ano = Convert.ToInt32(Console.ReadLine());
+
+        Console.Write("Prateleira: ");
+        novoLivro.Prateleira = Convert.ToInt32(Console.ReadLine());
+
+        biblioteca.Add(novoLivro);
+        Console.WriteLine("Livro cadastrado com sucesso!");
+    }
+
+    static void ProcurarLivroPorTitulo()
+    {
+        Console.Write("Digite o título do livro: ");
+        string titulo = Console.ReadLine();
+
+        Livro livroEncontrado = biblioteca.Find(l => l.Titulo.Equals(titulo, StringComparison.OrdinalIgnoreCase));
+
+        if (livroEncontrado.Titulo != null)
+        {
+            Console.WriteLine($"Título: {livroEncontrado.Titulo}, Prateleira: {livroEncontrado.Prateleira}");
+        }
+        else
+        {
+            Console.WriteLine("Livro não encontrado.");
+        }
+    }
+
+    static void MostrarTodosLivros()
+    {
+        if (biblioteca.Count == 0)
+        {
+            Console.WriteLine("Nenhum livro cadastrado.");
+            return;
+        }
+
+        foreach (var livro in biblioteca)
+        {
+            Console.WriteLine($"Título: {livro.Titulo}, Autor: {livro.Autor}, Ano: {livro.Ano}, Prateleira: {livro.Prateleira}");
+        }
+    }
+
+    static void LivrosMaisNovos()
+    {
+        Console.Write("Digite o ano: ");
+        int ano = Convert.ToInt32(Console.ReadLine());
+
+        var livrosMaisNovos = biblioteca.FindAll(l => l.Ano > ano);
+
+        if (livrosMaisNovos.Count > 0)
+        {
+            Console.WriteLine("Livros mais novos que o ano informado:");
+            foreach (var livro in livrosMaisNovos)
+            {
+                Console.WriteLine($"Título: {livro.Titulo}, Autor: {livro.Autor}, Ano: {livro.Ano}, Prateleira: {livro.Prateleira}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Nenhum livro mais novo que o ano informado.");
+        }
+    }
+}
+
